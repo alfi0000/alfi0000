@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Stok Barang</title>
+<style>
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #fffaf0;
+  margin: 0;
+}
+header {
+  background: #492828;
+  color: white;
+  text-align: center;
+  padding: 15px;
+}
+form {
+  background: white;
+  padding: 20px;
+  margin: 20px auto;
+  width: 80%;
+  border-radius: 10px;
+}
+input, button {
+  padding: 8px;
+  margin: 5px;
+}
+button {
+  background: #492828;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+button:hover {
+  background: #6a3a3a;
+}
+table {
+  width: 80%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  background: white;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+th {
+  background: #492828;
+  color: white;
+}
+a {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: #492828;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+</style>
+</head>
+<body>
+
+<header><h1>Stok Barang</h1></header>
+
+<form id="formStok">
+  <input type="text" id="kode" placeholder="Kode Barang" required>
+  <input type="text" id="nama" placeholder="Nama Barang" required>
+  <input type="number" id="harga" placeholder="Harga Barang" required>
+  <input type="number" id="stok" placeholder="Jumlah Stok" required>
+  <input type="text" id="satuan" placeholder="Satuan" required>
+  <button type="submit" id="btnSubmit">Tambah Stok</button>
+</form>
+
+<table id="tabelStok">
+  <thead>
+    <tr>
+      <th>Kode</th>
+      <th>Nama</th>
+      <th>Harga</th>
+      <th>Jumlah</th>
+      <th>Satuan</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<a href="index.html">← Kembali</a>
+
+<script>
+const form = document.getElementById("formStok");
+const tbody = document.querySelector("#tabelStok tbody");
+const btnSubmit = document.getElementById("btnSubmit");
+let data = JSON.parse(localStorage.getItem("stok")) || [];
+let editIndex = null;
+
+// Fungsi render tabel
+function render() {
+  tbody.innerHTML = "";
+  data.forEach((d, i) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${d.kode}</td>
+        <td>${d.nama}</td>
+        <td>${d.harga}</td>
+        <td>${d.stok}</td>
+        <td>${d.satuan}</td>
+        <td>
+          <button onclick="editData(${i})">Edit</button>
+          <button onclick="hapusData(${i})">Hapus</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+// Tambah atau simpan data
+form.addEventListener("submit", e => {
+  e.preventDefault();
+  const d = {
+    kode: form.kode.value,
+    nama: form.nama.value,
+    harga: form.harga.value,
+    stok: form.stok.value,
+    satuan: form.satuan.value
+  };
+
+  if (editIndex === null) {
+    // Tambah data baru
+    data.push(d);
+  } else {
+    // Simpan hasil edit
+    data[editIndex] = d;
+    editIndex = null;
+    btnSubmit.textContent = "Tambah Stok";
+  }
+
+  localStorage.setItem("stok", JSON.stringify(data));
+  form.reset();
+  render();
+});
+
+// Fungsi hapus data
+function hapusData(index) {
+  if (confirm("Yakin ingin menghapus data ini?")) {
+    data.splice(index, 1);
+    localStorage.setItem("stok", JSON.stringify(data));
+    render();
+  }
+}
+
+// Fungsi edit data
+function editData(index) {
+  const d = data[index];
+  form.kode.value = d.kode;
+  form.nama.value = d.nama;
+  form.harga.value = d.harga;
+  form.stok.value = d.stok;
+  form.satuan.value = d.satuan;
+  editIndex = index;
+  btnSubmit.textContent = "Simpan Perubahan";
+  form.scrollIntoView({ behavior: "smooth" });
+}
+
+// Render awal
+render();
+</script>
+
+</body>
+</html>
